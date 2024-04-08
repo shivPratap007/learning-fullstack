@@ -1,62 +1,87 @@
-import React, { memo, useContext, useState } from "react";
-import { CountContext } from "./components/context";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { counterState } from "./store/atoms/count";
+import React, { useState } from "react";
+import { useRecoilValue, useSetRecoilState,useRecoilState } from "recoil";
 import { RecoilRoot } from "recoil";
+import { filterTodo, searchTodo, todos } from "./store/atoms/todo";
 
 const App = () => {
   return (
-    <div>
+    <>
       <RecoilRoot>
-        <Todo></Todo>
+        <ShowTodo />
+        <SetTodo/>
+        <div>============================</div>
+
+        <SearchTodo />
+        <FilterTodoList />
       </RecoilRoot>
-    </div>
+    </>
   );
 };
 
-function Todo() {
-  console.log("hi");
+function SetTodo() {
+
+  const[todo,setTodo]=useState("");
+  const [allTodos,setTodoValue]=useRecoilState(todos);
+
+  function handleTodoSubmit(){
+    setTodoValue([...allTodos,{title:todo}]);
+    setTodo("");
+  }
   return (
-    <>
-      <div>
-        <ShowCount></ShowCount>
-        <ButtonsClick></ButtonsClick>
-      </div>
-    </>
+    <div>
+      <input
+        type="text"
+        style={{ border: "2px solid black" }}
+        value={todo}
+        onChange={(e) => {
+          setTodo(e.target.value);
+        }}
+      />
+      <button onClick={handleTodoSubmit}>Submit</button>
+    </div>
   );
-};
-function ShowCount() {
-  const counter = useRecoilValue(counterState);
+}
+
+function SearchTodo() {
+  const setInputValue = useSetRecoilState(searchTodo);
   return (
     <>
-      <div>Count is : {counter}</div>
+      <input
+        type="text"
+        style={{ border: "2px solid black" }}
+        onChange={(e) => {
+          setInputValue(e.target.value);
+        }}
+      />
     </>
   );
 }
-function ButtonsClick() {
-  const setCount=useSetRecoilState(counterState);
-  // const[count,setCount]=useRecoilState(counterState);
-  console.log("hi ------------")
+
+function FilterTodoList() {
+  const filterdTodo = useRecoilValue(filterTodo);
   return (
-    <>
-      <div>
-        <button
-          onClick={() => {
-            setCount((prev) => prev + 1);
-          }}
-        >
-          Increase
-        </button>
-        <br />
-        <button
-          onClick={() => {
-            setCount((prev) => prev - 1);
-          }}
-        >
-          Decrease
-        </button>
-      </div>
-    </>
+    <div>
+      {filterdTodo.map((todo) => (
+        <div key={todo.title}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+function ShowTodo() {
+  const [allTodos,setAllTodos ]= useRecoilState(todos);
+  
+  function handleDeleteTodos(dTodo){
+    let newTodos=allTodos.filter(todo=> todo.title!=dTodo);
+    setAllTodos([...newTodos]);
+  }
+
+  return (
+    <div>
+      {allTodos.map((todo) => (
+        <div key={todo.title}>{todo.title}
+        <div><button value={todo.title} onClick={()=>handleDeleteTodos(todo.title)}>Delete</button></div></div>
+      ))}
+    </div>
   );
 }
 
