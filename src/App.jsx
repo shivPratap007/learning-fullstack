@@ -1,31 +1,63 @@
-import React from 'react'
+import React, { memo, useContext, useState } from "react";
+import { CountContext } from "./components/context";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { counterState } from "./store/atoms/count";
+import { RecoilRoot } from "recoil";
 
 const App = () => {
   return (
     <div>
-      <WrapperComponet>
-        <InnerComponent/>
-      </WrapperComponet>
+      <RecoilRoot>
+        <Todo></Todo>
+      </RecoilRoot>
     </div>
-  )
-}
+  );
+};
 
-
-function WrapperComponet({children}){
-  return(
+function Todo() {
+  console.log("hi");
+  return (
     <>
-    <div className='border-2'>
-      {children}
-    </div>
+      <div>
+        <ShowCount></ShowCount>
+        <ButtonsClick></ButtonsClick>
+      </div>
     </>
-  )
+  );
+};
+function ShowCount() {
+  const counter = useRecoilValue(counterState);
+  return (
+    <>
+      <div>Count is : {counter}</div>
+    </>
+  );
+}
+function ButtonsClick() {
+  const setCount=useSetRecoilState(counterState);
+  // const[count,setCount]=useRecoilState(counterState);
+  console.log("hi ------------")
+  return (
+    <>
+      <div>
+        <button
+          onClick={() => {
+            setCount((prev) => prev + 1);
+          }}
+        >
+          Increase
+        </button>
+        <br />
+        <button
+          onClick={() => {
+            setCount((prev) => prev - 1);
+          }}
+        >
+          Decrease
+        </button>
+      </div>
+    </>
+  );
 }
 
-function InnerComponent(){
-  return(
-    <>
-    <div>I am inner component</div>
-    </>
-  )
-}
-export default App
+export default App;
